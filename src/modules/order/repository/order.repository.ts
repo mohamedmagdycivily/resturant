@@ -1,30 +1,26 @@
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { OrderInterface } from '../interface/order.interface';
 import { Order } from '../entity/order.entity';
-import { ObjectId } from 'mongodb';
 
+@Injectable()
 export class OrderRepository implements OrderInterface {
   constructor(
     @InjectRepository(Order)
-    private readonly orderRepo: MongoRepository<Order>
+    private readonly orderRepo: Repository<Order>
   ) {}
 
   async findById(id: string): Promise<Order | null> {
-    const objectId = new ObjectId(id); 
-    return this.orderRepo.findOne({ where: { _id: objectId } });
+    return await this.orderRepo.findOne({ where: { id: parseInt(id, 10) } });
   }
 
   async findAll(): Promise<Order[]> {
     return this.orderRepo.find();
   }
 
-  async create(order: Partial<Order>): Promise<Order> {
-    const newOrder = this.orderRepo.create(order);
+  async create(): Promise<Order> {
+    const newOrder = this.orderRepo.create();
     return this.orderRepo.save(newOrder);
-  }
-
-  async aggregate(pipeline: any[]): Promise<any[]> {
-    return this.orderRepo.aggregate(pipeline).toArray();
   }
 }

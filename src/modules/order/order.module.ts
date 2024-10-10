@@ -7,6 +7,8 @@ import { OrderRepository } from './repository/order.repository';
 import { OrderInterfaceToken } from './interface/order.interface';
 import { OrderController } from './order.controller';
 import { RedisModule } from 'src/redis/redis.module';
+import { OrderItemInterfaceToken } from './interface/orderItem.interface';
+import { OrderItemRepository } from './repository/orderItem.repository';
 
 @Module({
   imports: [RedisModule, TypeOrmModule.forFeature([Order, OrderItem])],
@@ -16,6 +18,10 @@ import { RedisModule } from 'src/redis/redis.module';
     {
       provide: OrderInterfaceToken,
       useClass: OrderRepository,
+    },
+    {
+      provide: OrderItemInterfaceToken,
+      useClass: OrderItemRepository,
     },
   ],
   exports: [OrderService],

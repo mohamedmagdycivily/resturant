@@ -1,84 +1,23 @@
 import { IsArray, IsString, ValidateNested, IsInt, IsOptional, IsNumber, IsPositive } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
-class ItemDTO {
-  @IsString()
-  name: string;
-
-  @IsNumber()
+class OrderItemDTO {
+  @ApiProperty({ example: 1 })
+  @IsInt()
   @IsPositive()
-  price: number;
+  product_id: number;
 
+  @ApiProperty({ example: 2 })
   @IsInt()
   @IsPositive()
   quantity: number;
-}
-
-class CustomerInfoDTO {
-  @IsString()
-  name: string;
-
-  @IsString()
-  @IsOptional()
-  contact?: string;
-
-  @IsString()
-  @IsOptional()
-  address?: string;
 }
 
 export class CreateOrderDTO {
+  @ApiProperty({ type: [OrderItemDTO] })
   @ValidateNested({ each: true })
-  @Type(() => ItemDTO)
+  @Type(() => OrderItemDTO)
   @IsArray()
-  items: ItemDTO[];
-
-  // @IsNumber()
-  // @IsPositive()
-  // totalPrice: number;
-
-  @ValidateNested()
-  @Type(() => CustomerInfoDTO)
-  customerInfo: CustomerInfoDTO;
-}
-
-class UpdateItemDTO {
-  @IsString()
-  @IsOptional()
-  name: string;
-
-  @IsNumber()
-  @IsPositive()
-  price: number;
-
-  @IsInt()
-  @IsOptional()
-  quantity: number;
-}
-
-class UpdateCustomerInfoDTO {
-  @IsString()
-  @IsOptional()
-  name: string;
-
-  @IsString()
-  @IsOptional()
-  contact: string;
-
-  @IsString()
-  @IsOptional()
-  address: string;
-}
-
-export class UpdateOrderDTO {
-  @ValidateNested({ each: true })
-  @Type(() => UpdateItemDTO)
-  @IsArray()
-  @IsOptional()
-  items?: UpdateItemDTO[];
-
-  @ValidateNested()
-  @Type(() => UpdateCustomerInfoDTO)
-  @IsOptional()
-  customerInfo?: UpdateCustomerInfoDTO;
+  products: OrderItemDTO[];
 }
