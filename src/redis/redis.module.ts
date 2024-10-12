@@ -2,6 +2,7 @@ import { Module, Global, OnModuleInit } from '@nestjs/common';
 import { RedisModule as NestRedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { redisConfig } from '../config/config.provider';
+import { RedisService } from './redis.service';
 
 @Global()
 @Module({
@@ -12,7 +13,8 @@ import { redisConfig } from '../config/config.provider';
       inject: [ConfigService], // Injects ConfigService into the factory function
     }),
   ],
-  exports: [NestRedisModule],
+  providers: [RedisService],
+  exports: [NestRedisModule, RedisService],
 })
 export class RedisModule implements OnModuleInit {
   onModuleInit() {
