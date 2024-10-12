@@ -13,4 +13,8 @@ export class IngredientService {
     @Inject(IngredientInterfaceToken) private readonly ingredientRepo: IngredientInterface,
     @InjectRedis() private readonly redis: Redis,
   ) {}
+
+  async update({ where, data }: { where: any; data: any; }): Promise<any> {
+    return this.ingredientRepo.update({ where, data });
+  }
 }

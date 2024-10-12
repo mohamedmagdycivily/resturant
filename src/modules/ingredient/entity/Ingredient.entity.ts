@@ -13,6 +13,9 @@ export class Ingredient {
   @Column()
   stock: number;
 
+  @Column()
+  available_stock: number;
+
   @Column({ default: false })
   email_sent: boolean;
 

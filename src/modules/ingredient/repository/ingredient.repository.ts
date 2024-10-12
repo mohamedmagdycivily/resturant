@@ -17,4 +17,16 @@ export class IngredientRepository implements IngredientInterface {
   create(order: Partial<Ingredient>): Promise<Ingredient> {
     throw new Error('Method not implemented.');
   }
+  update({ where, data }: { where: any; data: any; }): Promise<any> {
+    console.log('🌟🌟🌟{ where, data }  =  ', { where, data });
+    return this.ingredientRepo
+      .createQueryBuilder()
+      .update('ingredient')
+      .set({
+        available_stock: () => `"available_stock" - ${data.cutAmount}`,  // Raw SQL operation
+      })
+      .where('id = :id', { id: where.id })
+      .execute();
+    // return this.ingredientRepo.update(where, data);
+  }
 }
