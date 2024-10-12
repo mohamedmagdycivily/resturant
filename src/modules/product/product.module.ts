@@ -5,13 +5,13 @@ import { ProductIngredient } from './entity/productIngredient.entity';
 import { ProductService } from './product.service';
 import { ProductRepository } from './repository/product.repository';
 import { ProductInterfaceToken } from './interface/product.interface';
-import { ProductController } from './product.controller';
+import { ProductControllerV1 } from './product.controller';
 import { RedisModule } from 'src/redis/redis.module';
 import { ProductIngredientInterfaceToken } from './interface/productIngredient.interface';
 import { ProductIngredientRepository } from './repository/productIngredient.repository';
 @Module({
   imports: [RedisModule, TypeOrmModule.forFeature([Product, ProductIngredient])],
-  controllers: [ProductController],
+  controllers: [ProductControllerV1],
   providers: [
     ProductService,
     {

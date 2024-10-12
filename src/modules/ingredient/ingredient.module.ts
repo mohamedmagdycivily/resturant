@@ -4,12 +4,12 @@ import { Ingredient } from './entity/Ingredient.entity';
 import { IngredientService } from './ingredient.service';
 import { IngredientRepository } from './repository/ingredient.repository';
 import { IngredientInterfaceToken } from './interface/ingredient.interface';
-import { IngredientController } from './ingredient.controller';
+import { IngredientControllerV1 } from './ingredient.controller';
 import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [RedisModule, TypeOrmModule.forFeature([Ingredient])],
-  controllers: [IngredientController],
+  controllers: [IngredientControllerV1],
   providers: [
     IngredientService,
     {
