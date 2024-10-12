@@ -4,9 +4,9 @@ import { CreateOrderDTO } from './dto/order.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import swaggerConfig from './swagger/swagger.config';
-@ApiTags('orders')
-@Controller('orders')
-export class OrderController {
+@ApiTags('OrdersV1')
+@Controller({ path: 'orders', version: '1' })
+export class OrderControllerV1 {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
@@ -17,9 +17,9 @@ export class OrderController {
     @Body() order: CreateOrderDTO,
     @Res() response: Response
   ){
-    const orderItems = await this.orderService.create(order.products);
+    await this.orderService.create(order.products);
     return response.status(201).json({
-      status: 201,
+      statusCode: 201,
       message: 'order created successfully',
       data: {}
     });

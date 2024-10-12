@@ -1,24 +1,20 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { IngredientInterface } from '../interface/ingredient.interface';
 import { Ingredient } from '../entity/Ingredient.entity';
-import { ObjectId } from 'mongodb';
 
 export class IngredientRepository implements IngredientInterface {
   constructor(
     @InjectRepository(Ingredient)
-    private readonly orderRepo: MongoRepository<Ingredient>
+    private readonly ingredientRepo: Repository<Ingredient>
   ) {}
   findById(id: string): Promise<Ingredient | null> {
     throw new Error('Method not implemented.');
   }
-  findAll(): Promise<Ingredient[]> {
-    throw new Error('Method not implemented.');
+  findAll(ids: string[]): Promise<Ingredient[]> {
+    return this.ingredientRepo.find({where: { id: In(ids) }});
   }
   create(order: Partial<Ingredient>): Promise<Ingredient> {
-    throw new Error('Method not implemented.');
-  }
-  aggregate(pipeline: any[]): Promise<any[]> {
     throw new Error('Method not implemented.');
   }
 }

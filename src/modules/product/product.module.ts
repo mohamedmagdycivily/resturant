@@ -7,6 +7,8 @@ import { ProductRepository } from './repository/product.repository';
 import { ProductInterfaceToken } from './interface/product.interface';
 import { ProductController } from './product.controller';
 import { RedisModule } from 'src/redis/redis.module';
+import { ProductIngredientInterfaceToken } from './interface/productIngredient.interface';
+import { ProductIngredientRepository } from './repository/productIngredient.repository';
 @Module({
   imports: [RedisModule, TypeOrmModule.forFeature([Product, ProductIngredient])],
   controllers: [ProductController],
@@ -15,6 +17,10 @@ import { RedisModule } from 'src/redis/redis.module';
     {
       provide: ProductInterfaceToken,
       useClass: ProductRepository,
+    },
+    {
+      provide: ProductIngredientInterfaceToken,
+      useClass: ProductIngredientRepository,
     },
   ],
   exports: [ProductService],

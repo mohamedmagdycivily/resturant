@@ -5,14 +5,15 @@ import { OrderItem } from './entity/orderItem.entity';
 import { OrderService } from './order.service';
 import { OrderRepository } from './repository/order.repository';
 import { OrderInterfaceToken } from './interface/order.interface';
-import { OrderController } from './order.controller';
+import { OrderControllerV1 } from './order.controller';
 import { RedisModule } from 'src/redis/redis.module';
 import { OrderItemInterfaceToken } from './interface/orderItem.interface';
 import { OrderItemRepository } from './repository/orderItem.repository';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [RedisModule, TypeOrmModule.forFeature([Order, OrderItem])],
-  controllers: [OrderController],
+  imports: [ProductModule, RedisModule, TypeOrmModule.forFeature([Order, OrderItem])],
+  controllers: [OrderControllerV1],
   providers: [
     OrderService,
     {

@@ -1,13 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProductInterface } from '../interface/product.interface';
 import { Product } from '../entity/product.entity';
-import { ObjectId } from 'mongodb';
 
 export class ProductRepository implements ProductInterface {
   constructor(
     @InjectRepository(Product)
-    private readonly orderRepo: MongoRepository<Product>
+    private readonly productRepo: Repository<Product>
   ) {}
   findById(id: string): Promise<Product | null> {
     throw new Error('Method not implemented.');
@@ -18,8 +17,4 @@ export class ProductRepository implements ProductInterface {
   create(order: Partial<Product>): Promise<Product> {
     throw new Error('Method not implemented.');
   }
-  aggregate(pipeline: any[]): Promise<any[]> {
-    throw new Error('Method not implemented.');
-  }
-
 }
