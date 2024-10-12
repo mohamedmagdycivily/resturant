@@ -12,6 +12,7 @@ export class CreateDbTables1728556419613 implements MigrationInterface {
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) UNIQUE NOT NULL,
                 stock INT NOT NULL,
+                available_stock INT NOT NULL,
                 email_sent BOOLEAN DEFAULT FALSE
             );
 
@@ -41,15 +42,20 @@ export class CreateDbTables1728556419613 implements MigrationInterface {
                 FOREIGN KEY (ingredient_id) REFERENCES ingredient(id) ON DELETE CASCADE
             );
 
-            INSERT INTO product (name) VALUES ('Cheese Burger');
+            INSERT INTO product (name) VALUES ('Cheese Burger'), ('Wild Burger');
 
-            INSERT INTO ingredient (name, stock) VALUES ('Beef', 20000), ('Cheese', 5000), ('Onion', 1000);
+            INSERT INTO ingredient (name, stock, available_stock) VALUES ('Beef', 20000, 20000), ('Cheese', 5000, 5000), ('Onion', 1000, 1000);
 
             INSERT INTO product_ingredient (product_id, ingredient_id, amount)
             VALUES 
-                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Beef'), 150),
-                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Cheese'), 30),
-                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Onion'), 20);
+                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Beef'), 1000),
+                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Cheese'), 100),
+                ((SELECT id FROM product WHERE name = 'Cheese Burger'), (SELECT id FROM ingredient WHERE name = 'Onion'), 10),
+
+                ((SELECT id FROM product WHERE name = 'Wild Burger'), (SELECT id FROM ingredient WHERE name = 'Beef'), 500),
+                ((SELECT id FROM product WHERE name = 'Wild Burger'), (SELECT id FROM ingredient WHERE name = 'Cheese'), 50),
+                ((SELECT id FROM product WHERE name = 'Wild Burger'), (SELECT id FROM ingredient WHERE name = 'Onion'), 5);
+
         `);
     }
 
