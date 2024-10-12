@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common'; // import built-in ValidationPipe
+import { ValidationPipe, VersioningType } from '@nestjs/common'; // import built-in ValidationPipe
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableVersioning({  // Enable versioning
+    type: VersioningType.URI,
+    prefix: 'api/v', // prefix for versioning
+  });
   app.useGlobalPipes(new ValidationPipe()); // enable ValidationPipe`
   app.enableCors();
   const options = new DocumentBuilder()
