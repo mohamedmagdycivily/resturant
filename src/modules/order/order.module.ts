@@ -11,9 +11,10 @@ import { OrderItemInterfaceToken } from './interface/orderItem.interface';
 import { OrderItemRepository } from './repository/orderItem.repository';
 import { ProductModule } from '../product/product.module';
 import { MyBullModule } from 'src/bull/bull.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
-  imports: [ProductModule, RedisModule, MyBullModule, TypeOrmModule.forFeature([Order, OrderItem])],
+  imports: [ProductModule, RedisModule, MyBullModule, NotificationModule, TypeOrmModule.forFeature([Order, OrderItem])],
   controllers: [OrderControllerV1],
   providers: [
     OrderService,
