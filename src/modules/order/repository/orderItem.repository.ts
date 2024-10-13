@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { OrderItem } from '../entity/orderItem.entity';
 import { OrderItemInterface } from '../interface/orderItem.interface';
 
@@ -8,19 +8,19 @@ import { OrderItemInterface } from '../interface/orderItem.interface';
 export class OrderItemRepository implements OrderItemInterface {
   constructor(
     @InjectRepository(OrderItem)
-    private readonly orderRepo: Repository<OrderItem>
+    private readonly orderItemRepo: Repository<OrderItem>
   ) {}
 
   async findById(id: string): Promise<OrderItem | null> {
-    return await this.orderRepo.findOne({where: {id: Number(id)}});
+    return await this.orderItemRepo.findOne({where: {id: Number(id)}});
   }
 
   async findAll(): Promise<OrderItem[]> {
-    return this.orderRepo.find();
+    return this.orderItemRepo.find();
   }
 
-  async create(orders: Partial<OrderItem>[]): Promise<any>{
-    const newOrders = this.orderRepo.create(orders);
-    return this.orderRepo.save(orders);
+  async create(orderItemsData: Partial<OrderItem>[], manager: EntityManager): Promise<OrderItem[]> {
+    const orderItems = orderItemsData.map(item => manager.create(OrderItem, item));
+    return await manager.save(orderItems);
   }
 }

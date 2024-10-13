@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { OrderInterface } from '../interface/order.interface';
 import { Order } from '../entity/order.entity';
 
@@ -19,8 +19,8 @@ export class OrderRepository implements OrderInterface {
     return this.orderRepo.find();
   }
 
-  async create(): Promise<Order> {
-    const newOrder = this.orderRepo.create();
-    return this.orderRepo.save(newOrder);
+  async create(orderData: Partial<Order>, manager: EntityManager): Promise<Order> {
+    const order = manager.create(Order, orderData);
+    return await manager.save(order);
   }
 }

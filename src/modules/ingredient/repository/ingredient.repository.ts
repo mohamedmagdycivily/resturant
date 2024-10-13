@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { IngredientInterface } from '../interface/ingredient.interface';
 import { Ingredient } from '../entity/Ingredient.entity';
 
@@ -17,9 +17,9 @@ export class IngredientRepository implements IngredientInterface {
   create(order: Partial<Ingredient>): Promise<Ingredient> {
     throw new Error('Method not implemented.');
   }
-  update({ where, data }: { where: any; data: any; }): Promise<any> {
+  update({ where, data }: { where: any; data: any; }, manager: EntityManager): Promise<any> {
     console.log('🌟🌟🌟{ where, data }  =  ', { where, data });
-    return this.ingredientRepo
+    return manager
       .createQueryBuilder()
       .update('ingredient')
       .set({

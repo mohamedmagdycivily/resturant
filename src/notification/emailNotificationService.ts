@@ -1,7 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { NotificationService } from './notification.interface';
-// import mailjet from 'node-mailjet';
-const mailjet = require('node-mailjet'); //TODO:
+const mailjet = require('node-mailjet');
 import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class EmailNotificationService implements NotificationService {
@@ -11,7 +10,6 @@ export class EmailNotificationService implements NotificationService {
   constructor(
     @Inject() private readonly configService: ConfigService,
   ) {
-    // Initialize the Mailjet client with your API keys
     this.mailjetClient = new mailjet({
       apiKey: this.configService.get<string>('MAILJET_APIKEY'),
       apiSecret: this.configService.get<string>('MAILJET_SECRETKEY'),

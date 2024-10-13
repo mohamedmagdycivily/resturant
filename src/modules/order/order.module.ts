@@ -12,9 +12,11 @@ import { OrderItemRepository } from './repository/orderItem.repository';
 import { ProductModule } from '../product/product.module';
 import { MyBullModule } from 'src/bull/bull.module';
 import { NotificationModule } from 'src/notification/notification.module';
+import { OrderProcessor } from './order.processor';
+import { IngredientModule } from '../ingredient/ingredient.module';
 
 @Module({
-  imports: [ProductModule, RedisModule, MyBullModule, NotificationModule, TypeOrmModule.forFeature([Order, OrderItem])],
+  imports: [IngredientModule, ProductModule, RedisModule, MyBullModule, NotificationModule, TypeOrmModule.forFeature([Order, OrderItem])],
   controllers: [OrderControllerV1],
   providers: [
     OrderService,
@@ -26,6 +28,7 @@ import { NotificationModule } from 'src/notification/notification.module';
       provide: OrderItemInterfaceToken,
       useClass: OrderItemRepository,
     },
+    OrderProcessor,
   ],
   exports: [OrderService],
 })

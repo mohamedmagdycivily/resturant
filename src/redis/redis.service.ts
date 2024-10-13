@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Redis } from 'ioredis';
+import { ChainableCommander, Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 
@@ -91,6 +91,17 @@ export class RedisService {
     }
 }
 
+  multiSetValue(multi: ChainableCommander, key: string, value: string, expiry?: number, isNonExpiring?: boolean, ){
+    try {
+        // If isNonExpiring is true, do not set an expiration
+        isNonExpiring 
+            ? multi.set(key, value) // No expiry argument
+            : multi.set(key, value, 'EX', expiry || this.LOCK_EXPIRY_TIME); // Use expiry
+    } catch (error) {
+        this.logger.error(`Error setting value for key ${key}: ${error.message}`);
+    }
+  }
+
 
   private getLockKey(key: string): string {
     return `lock:${key}`;
@@ -99,4 +110,13 @@ export class RedisService {
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  createTransaction() {
+    return this.redis.multi();
+  }
+
+  async commitTransaction(multi: ChainableCommander): Promise<void> {
+    const results = await multi.exec();
+  }
+
 }

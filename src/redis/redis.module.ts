@@ -8,9 +8,9 @@ import { RedisService } from './redis.service';
 @Module({
   imports: [
     NestRedisModule.forRootAsync({
-      imports: [ConfigModule], // Ensures ConfigModule is available
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => await redisConfig(configService),
-      inject: [ConfigService], // Injects ConfigService into the factory function
+      inject: [ConfigService],
     }),
   ],
   providers: [RedisService],
