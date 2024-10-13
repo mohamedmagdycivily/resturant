@@ -9,6 +9,7 @@ import { ProductModule } from '../modules/product/product.module';
 import { DatabaseModule } from '../database/database.module';
 import { RedisModule } from '../redis/redis.module';
 import { MyBullModule } from '../bull/bull.module'; 
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MyBullModule } from '../bull/bull.module';
     DatabaseModule,
     RedisModule,
     MyBullModule,
+    NotificationModule,
   ],
   controllers: [
     AppController,

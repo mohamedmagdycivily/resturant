@@ -17,7 +17,7 @@ export class OrderService {
     @Inject(OrderItemInterfaceToken) private readonly orderItemRepo: OrderItemInterface,
     private readonly productService: ProductService,
     private readonly redisService: RedisService,
-    private readonly queueService: QueueService
+    private readonly queueService: QueueService,
   ) {}
 
   async create(orderItems: Partial<OrderItem>[]) {
@@ -40,7 +40,14 @@ export class OrderService {
       await this.enqueueUpdateJobs(updateRedisData);
 
       this.logger.log(`Sending notification as stock is cut by 50%...`);
-      // TODO: send email notification
+      await this.queueService.addNotificationJob({
+        to: 'mohamedmagdycivily@gmail.com', 
+        subject: 'Stock Update', 
+        message: 'Stock reduced by 50%', 
+        type: 'email',
+        action: 'send notification',
+        jobID: Math.floor(Math.random() * (100000 - 1000 + 1)) + 1000,
+      });
     } finally {
       await this.redisService.releaseLocks(acquiredLocks);
     }
@@ -83,6 +90,8 @@ export class OrderService {
           redisKey,
           redisValue: JSON.stringify({ stock, availableStock: newAvailableStock, emailSent }),
           cutAmount: requiredAmount,
+          expiry: undefined,
+          isNonExpiring: true,
         });
       }
     }
@@ -93,7 +102,7 @@ export class OrderService {
   private async updateRedisData(updateRedisData: RedisData[]) {
     this.logger.log('Updating Redis data...');
     await Promise.all(updateRedisData.map(data =>
-      this.redisService.setValue(data.redisKey, data.redisValue)
+      this.redisService.setValue(data.redisKey, data.redisValue, data.expiry, data.isNonExpiring)
     ));
   }
 
@@ -122,4 +131,6 @@ interface RedisData {
   redisKey: string;
   redisValue: string;
   cutAmount: number;
+  expiry: number | undefined;
+  isNonExpiring: boolean;
 }

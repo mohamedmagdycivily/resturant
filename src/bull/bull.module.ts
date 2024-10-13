@@ -12,7 +12,7 @@ import { Product } from 'src/modules/product/entity/product.entity';
       useFactory: async (configService: ConfigService) => await redisConfig(configService) as Promise<BullRootModuleOptions> | BullRootModuleOptions,
       inject: [ConfigService],
     }),
-    BullModule.registerQueue({ name: 'my-queue' }),
+    BullModule.registerQueue({ name: 'my-queue' }, { name: 'notification-queue' }),
   ],
   providers: [
     QueueService,
