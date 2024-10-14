@@ -1,0 +1,47 @@
+SELF NOTES:
+________________________________________
+
+terminal 1: working on redis
+redis-cli
+DEL 1 2 3
+-----------------
+
+terminal 2: script to get the needed keys from redis
+#!/bin/bash
+
+cursor="0"
+
+while true; do
+    result=$(redis-cli SCAN "$cursor")
+    cursor=$(echo "$result" | head -n 1)
+    keys=$(echo "$result" | tail -n +2)
+
+    for key in $keys; do
+        value=$(redis-cli GET "$key" 2>/dev/null)
+        
+        # Fallback to HGETALL if value is empty
+        if [ -z "$value" ]; then
+            value=$(redis-cli HGETALL "$key" 2>/dev/null)
+        fi
+
+        # Validate JSON format
+        if echo "$value" | jq empty > /dev/null 2>&1; then
+            echo "$key: $value"
+        fi
+    done
+
+    # Exit the loop if cursor is 0
+    [[ "$cursor" == "0" ]] && break
+done
+
+--------------
+
+terminal 3: update redis with data
+redis-cli SET 1 "{\"stock\": 20000, \"availableStock\": 20000, \"emailSent\": false}"
+redis-cli SET 2 "{\"stock\": 5000, \"availableStock\": 5000, \"emailSent\": false}"
+redis-cli SET 3 "{\"stock\": 1000, \"availableStock\": 1000, \"emailSent\": false}"
+-------------
+
+terminal 4: hit the server with 1000 request
+for i in {1..1000}; do echo "Sending request $i"; curl -X POST http://localhost:3000/api/v1/orders -H "Content-Type: application/json" -d '{"products":[{"product_id":1,"quantity":1}]}'; echo ""; done
+-------------
