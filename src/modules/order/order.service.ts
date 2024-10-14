@@ -4,9 +4,9 @@ import { OrderInterface, OrderInterfaceToken } from './interface/order.interface
 import { OrderItemInterface, OrderItemInterfaceToken } from './interface/orderItem.interface';
 import { OrderItem } from './entity/orderItem.entity';
 import { ProductService } from '../product/product.service';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisService } from '../../redis/redis.service';
 import { ProductIngredient } from '../product/entity/productIngredient.entity';
-import { QueueService } from 'src/bull/queue.service';
+import { QueueService } from '../../bull/queue.service';
 import { ConfigService } from '@nestjs/config';
 import { QueryRunner, DataSource } from 'typeorm';
 import { IngredientService } from '../ingredient/ingredient.service';
