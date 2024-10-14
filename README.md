@@ -45,10 +45,13 @@ The incoming payload may look like this:
 
 # Solution Discussion
 
-Key Challenges
-The main challenge is the need to update the Ingredient table every time an order is placed. Using database transactions for each update can significantly slow down the system, especially under heavy load.
+Key Challenges:
 
-Proposed Solution
+The main challenge is the need to update the Ingredient table every time an order is placed. 
+Using database transactions for each update can significantly slow down the system, especially under heavy load.
+
+Proposed Solution:
+
 To address the performance issues, the following approach was implemented:
 
 1- Redis-Based Queue:
