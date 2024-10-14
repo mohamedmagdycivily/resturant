@@ -1,0 +1,18 @@
+@port = 3000
+
+# orders
+POST http://localhost:{{port}}/api/v1/orders
+Content-Type: application/json
+
+{
+    "products": [
+        {
+        "product_id": 1,
+        "quantity": 2
+        },
+        {
+        "product_id": 2,
+        "quantity": 2
+        }
+    ]
+}

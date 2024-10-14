@@ -29,6 +29,9 @@ export class OrderService {
   async create(orderItems: Partial<OrderItem>[]) {
     const products = this.mapOrderItemsToProducts(orderItems);
     const productIngredients = await this.productService.findAllProductIngredients(Object.keys(products));
+    if(productIngredients.length === 0) {
+      throw new BadRequestException('No product ingredients found');
+    }
     const ingredientRequiredAmount = this.getIngredientRequiredAmount(productIngredients, products);
     const redisKeys = Object.keys(ingredientRequiredAmount);
     const acquiredLocks = await this.redisService.acquireLocks(redisKeys);
