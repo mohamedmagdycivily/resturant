@@ -10,9 +10,11 @@ export class ProductIngredientRepository implements ProductIngredientInterface {
     private readonly productIngredientRepo: Repository<ProductIngredient>
   ) {}
   findAll(productIds: string[]): Promise<ProductIngredient[]> {
-    return this.productIngredientRepo.find({
-      where: { product_id: In(productIds) },
-      select: ['id','ingredient_id', 'product_id', 'amount'],
-    })
+    return this.productIngredientRepo
+    .createQueryBuilder('productIngredient')
+    .leftJoinAndSelect('productIngredient.ingredient', 'ingredient')
+    .where('productIngredient.product_id IN (:...productIds)', { productIds })
+    .select(['productIngredient.id', 'productIngredient.ingredient_id', 'productIngredient.product_id', 'productIngredient.amount', 'ingredient.name'])
+    .getMany();
   }
 }

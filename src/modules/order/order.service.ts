@@ -28,7 +28,7 @@ export class OrderService {
 
   async create(orderItems: Partial<OrderItem>[]) {
     const products = this.mapOrderItemsToProducts(orderItems);
-    const productIngredients = await this.productService.findAll(Object.keys(products));
+    const productIngredients = await this.productService.findAllProductIngredients(Object.keys(products));
     const ingredientRequiredAmount = this.getIngredientRequiredAmount(productIngredients, products);
     const redisKeys = Object.keys(ingredientRequiredAmount);
     const acquiredLocks = await this.redisService.acquireLocks(redisKeys);
@@ -77,12 +77,19 @@ export class OrderService {
   private getIngredientRequiredAmount(
     productIngredients: ProductIngredient[],
     products: Record<string, number>
-  ): Record<string, number> {
-    return productIngredients.reduce((acc, ingredient) => {
+  ): Record<string, {requiredAmount: number, name: string}> {
+    const formatedProductIngredients = {};
+
+    for (const ingredient of productIngredients) {
       const requiredAmount = ingredient.amount * products[ingredient.product_id];
-      acc[ingredient.ingredient_id] = (acc[ingredient.ingredient_id] || 0) + requiredAmount;
-      return acc;
-    }, {} as Record<string, number>);
+      if(!formatedProductIngredients[ingredient.ingredient_id]) {
+        formatedProductIngredients[ingredient.ingredient_id] = { requiredAmount,  name: ingredient.ingredient.name };
+      }else{
+        formatedProductIngredients[ingredient.ingredient_id].requiredAmount += requiredAmount
+      }
+    }
+
+    return formatedProductIngredients;
   }
 
   private mapOrderItemsToProducts(orderItems: Partial<OrderItem>[]): Record<string, number> {
@@ -93,24 +100,27 @@ export class OrderService {
   }
 
   private async processIngredients(
-    ingredientRequiredAmount: Record<string, number>
+    ingredientRequiredAmount: Record<string, {requiredAmount: number, name: string}>
   ): Promise<{ updateRedisData: RedisData[], errors: string[] }> {
     const updateRedisData: RedisData[] = [];
     const errors: string[] = [];
 
-    for (const [ingredientId, requiredAmount] of Object.entries(ingredientRequiredAmount)) {
+    for (const ingredientId of Object.keys(ingredientRequiredAmount)) {
+      const requiredAmount = ingredientRequiredAmount[ingredientId].requiredAmount;
+      const ingredientName = ingredientRequiredAmount[ingredientId].name;
       const redisKey = ingredientId;
       const oldRedisValue = await this.redisService.getValue(redisKey);
       const { stock, availableStock, emailSent } = JSON.parse(oldRedisValue);
 
       if (availableStock < requiredAmount) {
-        errors.push(`Insufficient stock for ingredient ${ingredientId}: required ${requiredAmount}, available ${availableStock}.`);
+        errors.push(`Insufficient stock for ingredient ${ingredientName}: required ${requiredAmount}, available ${availableStock}.`);
       } else {
         const newAvailableStock = availableStock - requiredAmount;
         const newEmailSent = newAvailableStock < stock * 0.5 ? true : emailSent;
         const sendEmail = !emailSent && newEmailSent ? true : false; 
         updateRedisData.push({
           redisKey,
+          ingredientName,
           newRedisValue: JSON.stringify({ stock, availableStock: newAvailableStock, emailSent: newEmailSent }),
           cutAmount: requiredAmount,
           expiry: undefined,
@@ -152,7 +162,7 @@ export class OrderService {
           const job = {
             to: this.configService.get<string>('NOTIFICATION_EMAIL'),
             subject: 'Stock Update',
-            message: `Stock ${data.redisKey} reduced by 50%`,
+            message: `${data.ingredientName} Stock Decreased by 50%`,
             type: 'email',
             action: 'send notification',
             jobID: this.generateRandomJobID(),
@@ -204,6 +214,7 @@ export class OrderService {
 
 interface RedisData {
   redisKey: string; // ingredientID
+  ingredientName: string;
   newRedisValue: string;
   cutAmount: number;
   expiry: number | undefined;

@@ -17,7 +17,7 @@ export class ProductService {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async findAll(ids: string[]): Promise<ProductIngredient[]> {
+  async findAllProductIngredients(ids: string[]): Promise<ProductIngredient[]> {
     return this.productIngredientRepo.findAll(ids);
   }
 }
