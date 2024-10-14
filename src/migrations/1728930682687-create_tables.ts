@@ -1,17 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 import Redis from 'ioredis';  // Ensure correct import
 export class CreateTables1728930682687 implements MigrationInterface {
-    private redis: Redis;
-
-    constructor() {
-        // Connect to Redis using environment variables directly
-        this.redis = new Redis({
-            host: process.env.REDIS_HOST,
-            port: Number(process.env.REDIS_PORT),
-            password: process.env.REDIS_PASSWORD, // Optional, only if needed
-        });
-    }
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE product (
@@ -71,6 +60,12 @@ export class CreateTables1728930682687 implements MigrationInterface {
         `);
 
         // Cache the ingredients in Redis after insertion
+        let redis = await new Redis({
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT),
+            password: process.env.REDIS_PASSWORD, // Optional, only if needed
+        });
+
         const ingredients = [
             { id: 1, stock: 20000, availableStock: 20000, emailSent: false },
             { id: 2, stock: 5000, availableStock: 5000, emailSent: false },
@@ -78,14 +73,14 @@ export class CreateTables1728930682687 implements MigrationInterface {
         ];
 
         for (const ingredient of ingredients) {
-            await this.redis.set(ingredient.id.toString(), JSON.stringify({
+            await redis.set(ingredient.id.toString(), JSON.stringify({
                 stock: ingredient.stock,
                 availableStock: ingredient.availableStock,
                 emailSent: ingredient.emailSent,
             }));
         }
 
-        this.redis.quit();  // Close the Redis connection after usage
+        redis.quit();  // Close the Redis connection after usage
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -98,11 +93,16 @@ export class CreateTables1728930682687 implements MigrationInterface {
         `);
 
         // Clean up Redis data
-        await this.redis.del('1');
-        await this.redis.del('2');
-        await this.redis.del('3');
+        let redis = await new Redis({
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT),
+            password: process.env.REDIS_PASSWORD, // Optional, only if needed
+        });
+        await redis.del('1');
+        await redis.del('2');
+        await redis.del('3');
 
-        this.redis.quit();  // Close the Redis connection
+        redis.quit();  // Close the Redis connection
     }
 }
 
