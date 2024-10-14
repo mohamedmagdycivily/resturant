@@ -44,10 +44,15 @@ services:
       - '6382:6379' # Host port 6382 mapped to container port 6379
     networks:
       - backend
-
+    volumes:
+      - redis-data:/data  # Persist Redis data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf  # Mount custom config
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]  # Start Redis with custom config
+    
 networks:
   backend:
     driver: bridge
 
 volumes:
   postgres-data:
+  redis-data:
